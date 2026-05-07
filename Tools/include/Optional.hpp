@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 namespace tools {
 
     struct nullopt_t {};
@@ -18,17 +20,17 @@ namespace tools {
         explicit operator bool() const { return has_value; } // allows for if (myOpt) { ... }
 
         T& operator*() { return value; } // allows for *myOpt = ... 
-        const T& operator*() const { return value; }
+        const T& operator*() const { assert(has_value); return value; }
 
         T* operator->() { return &value; }
-        const T* operator->() const { return &value; }
+        const T* operator->() const { assert(has_value); return &value; }
 
         bool operator==(const Optional<T>& other) const {
             return has_value == other.has_value && (!has_value || value == other.value);
         }
 
         bool operator!=(const Optional<T>& other) const {
-            return !(value == other.value);
+            return !(*this == other);
         }
 
         bool operator==(const nullopt_t) const { return !has_value; }
