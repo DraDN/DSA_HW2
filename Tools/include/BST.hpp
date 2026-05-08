@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Optional.hpp"
+#include "Queue.hpp"
+#include <memory>
 
 namespace tools {
 
@@ -18,7 +20,7 @@ namespace tools {
 
         public:
             BST() {};
-            ~BST() {};
+            ~BST() { destroy(root); }
             BST(const BST&) = delete; // disable copy constructor
             BST& operator=(const BST&) = delete;
 
@@ -26,10 +28,10 @@ namespace tools {
             void remove(T value) { remove(value, root); }
 
             tools::Optional<T> find(T value) const { return find(value, root); }
-            tools::Optional<T> findInRange(T min, T max) const { return findInRange(min, max, root); }
+            void findInRange(T min, T max, tools::Queue<T>& result) const;
 
-            template <typename Criterion>
-            tools::Optional<T> findLinear(Criterion criterion) const { return findLinear(criterion, root); } // returns the first node that makes the criterion return true
+            template <typename Func>
+            tools::Optional<T> findLinear(Func criterion) const { return findLinear(criterion, root); } // returns the first node that makes the criterion return true
 
             template <typename Func>
             void traverseInOrder(Func function) const { traverseInOrder(function, root); }
@@ -49,27 +51,32 @@ namespace tools {
         private:
             BSTNode* root = nullptr;
         
-        // private functions to help recursion
         private:
+            void destroy(BSTNode* node);
+
+            BSTNode* in_order_successor(BSTNode* node);
+
+            // private functions to help recursion
             void insert(T value, BSTNode*& node);
             void remove(T value, BSTNode*& node);
 
-            tools::Optional<T> find(T value, BSTNode* node) const;
-            tools::Optional<T> findInRange(T min, T max, BSTNode* node) const;
-
-            template <typename Criterion>
-            tools::Optional<T> findLinear(Criterion criterion, BSTNode* node) const;
+            tools::Optional<T> find(T value, const BSTNode* node) const;
 
             template <typename Func>
-            void traverseInOrder(Func function, BSTNode* node) const;
-            template <typename Func>
-            void traversePreOrder(Func function, BSTNode* node) const;
-            template <typename Func>
-            void traversePostOrder(Func function, BSTNode* node) const;
+            tools::Optional<T> findLinear(Func criterion, const BSTNode* node) const;
 
-            unsigned int getHeight(BSTNode* node) const;
-            unsigned int getNumberOfLeafs(BSTNode* node) const;
-            bool isBalanced(BSTNode* node) const;
+            template <typename Func>
+            void traverseInOrder(Func function, const BSTNode* node) const;
+            template <typename Func>
+            void traversePreOrder(Func function, const BSTNode* node) const;
+            template <typename Func>
+            void traversePostOrder(Func function, const BSTNode* node) const;
+
+            unsigned int getHeight(const BSTNode* node) const;
+            unsigned int getNumberOfLeafs(const BSTNode* node) const;
+            bool isBalanced(const BSTNode* node) const;
     };
 
 }
+
+#include "BST.tpp"
