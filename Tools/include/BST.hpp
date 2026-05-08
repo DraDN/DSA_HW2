@@ -42,7 +42,8 @@ namespace tools {
 
             tools::Optional<T> getMin() const;
             tools::Optional<T> getMax() const;
-            tools::Optional<T> getKthLargest(unsigned int k) const;
+            tools::Optional<T> getKthLargest(unsigned int k) const { return getKthLargest(k, root); }
+            tools::Optional<T> getLastCommonAncestor(T value1, T value2) const { return getLastCommonAncestor(value1, value2, root); }
 
             unsigned int getHeight() const { return getHeight(root); }
             unsigned int getNumberOfLeafs() const { return getNumberOfLeafs(root); }
@@ -71,6 +72,9 @@ namespace tools {
             void traversePreOrder(Func function, const BSTNode* node) const;
             template <typename Func>
             void traversePostOrder(Func function, const BSTNode* node) const;
+
+            tools::Optional<T> getKthLargest(unsigned int& k, const BSTNode* node) const;
+            tools::Optional<T> getLastCommonAncestor(T value1, T value2, const BSTNode* node) const;
 
             unsigned int getHeight(const BSTNode* node) const;
             unsigned int getNumberOfLeafs(const BSTNode* node) const;

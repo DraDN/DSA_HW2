@@ -165,3 +165,23 @@ tools::Optional<T> tools::BST<T>::getMax() const {
 
     return tools::Optional<T>(*current->data);
 }
+
+template <typename T>
+tools::Optional<T> tools::BST<T>::getKthLargest(unsigned int& k, const BSTNode* node) const {
+    if (!node) return tools::nullopt;
+
+    tools::Optional<T> right_result = getKthLargest(k, node->right);
+    if (right_result) return right_result;
+    else if (k-- == 1) return tools::Optional<T>(*node->data); // here, you visit the node - decrement one from k
+    else return getKthLargest(k, node->left);
+}
+
+template <typename T>
+tools::Optional<T> tools::BST<T>::getLastCommonAncestor(T value1, T value2, const BSTNode* node) const {
+    if (!node) return tools::nullopt;
+
+    if (value1 < *node->data && value2 < *node->data) return getLastCommonAncestor(value1, value2, node->left);
+    else if (value1 > *node->data && value2 > *node->data) return getLastCommonAncestor(value1, value2, node->right);
+    else return tools::Optional<T>(*node->data);
+}
+
