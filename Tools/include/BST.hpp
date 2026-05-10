@@ -145,7 +145,6 @@ namespace tools {
 
             unsigned int getHeight(const BSTNode* node) const;
             void getLeafs(tools::Queue<T>& result, const BSTNode* node) const;
-            // unsigned int getNumberOfLeafs(const BSTNode* node) const;
             bool isBalanced(const BSTNode* node) const;
     };
 

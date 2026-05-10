@@ -21,6 +21,9 @@ void tools::BST<T>::insert(T value, BSTNode*& node) {
     else if (value > *node->data) insert(value, node->right);
 }
 
+/*
+    Found by going to the right once and then going to the left as much as possible
+*/
 template <typename T>
 auto tools::BST<T>::in_order_successor(BSTNode* node) -> BSTNode* {
     tools::BST<T>::BSTNode* current = node->right;
@@ -32,9 +35,10 @@ template <typename T>
 void tools::BST<T>::remove(T value, BSTNode*& node) {
     if (!node) return;
 
+    /// search for the value
     if (value < *node->data) remove(value, node->left);
     else if (value > *node->data) remove(value, node->right);
-
+    /// if the value is found
     else if (node->left && node->right) { // if it has two children
         tools::BST<T>::BSTNode* successor = in_order_successor(node);
         *node->data = *successor->data;
@@ -58,15 +62,6 @@ tools::Optional<T> tools::BST<T>::find(T value, const BSTNode* node) const {
     else return tools::Optional<T>(*node->data);
 }
 
-// template <typename T>
-// tools::Optional<T> tools::BST<T>::findInRange(T min, T max, const BSTNode* node) const {
-//     if (!node) return tools::nullopt;
-
-//     if (*node->data < min) return findInRange(min, max, node->right);
-//     else if (*node->data > max) return findInRange(min, max, node->left);
-//     else return tools::Optional<T>(*node->data);
-// }
-
 template <typename T>
 void tools::BST<T>::findInRange(T min, T max, tools::Queue<T>& result, const BSTNode* node) const {
     if (!node) return;
@@ -80,6 +75,9 @@ void tools::BST<T>::findInRange(T min, T max, tools::Queue<T>& result, const BST
     }
 }
 
+/*
+    Go through the tree in-order and find the first element that matches the criterion
+*/
 template <typename T>
 template <typename Func>
 tools::Optional<T> tools::BST<T>::findLinear(Func criterion, const BSTNode* node) const {
@@ -132,7 +130,6 @@ unsigned int tools::BST<T>::getHeight(const BSTNode* node) const {
 }
 
 template <typename T>
-// unsigned int tools::BST<T>::getNumberOfLeafs(const BSTNode* node) const {
 void tools::BST<T>::getLeafs(tools::Queue<T>& result, const BSTNode* node) const {
     if (!node) return;
 
@@ -177,6 +174,9 @@ tools::Optional<T> tools::BST<T>::getMax() const {
     return tools::Optional<T>(*current->data);
 }
 
+/*
+    Go in inverse in-order traversal and decrement k until reaching 1 - that's the element
+*/
 template <typename T>
 tools::Optional<T> tools::BST<T>::getKthLargest(unsigned int& k, const BSTNode* node) const {
     if (!node) return tools::nullopt;
@@ -187,6 +187,10 @@ tools::Optional<T> tools::BST<T>::getKthLargest(unsigned int& k, const BSTNode* 
     else return getKthLargest(k, node->left);
 }
 
+/*
+    Go in the direction of the values (if both are smaller, go left, if both are bigger, go right)
+    Until you find the point between the two values - that's the LCA
+*/
 template <typename T>
 tools::Optional<T> tools::BST<T>::getLowestCommonAncestor(T value1, T value2, const BSTNode* node) const {
     if (!node) return tools::nullopt;

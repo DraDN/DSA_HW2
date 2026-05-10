@@ -30,7 +30,7 @@ namespace RK {
             Knight(const Knight& other) {
                 braveryScore = other.braveryScore;
                 battlesWon = other.battlesWon;
-                name = other.name ? new char[strlen(other.name) + 1] : nullptr;
+                name = other.name ? new char[strlen(other.name) + 1] : nullptr; // check if the other's name is not nullptr
                 house = other.house ? new char[strlen(other.house) + 1] : nullptr;
                 if (name) strcpy(name, other.name);
                 if (house) strcpy(house, other.house);
@@ -41,14 +41,15 @@ namespace RK {
                 battlesWon = other.battlesWon;
                 delete[] name;
                 delete[] house;
-                name = new char[strlen(other.name) + 1];
-                house = new char[strlen(other.house) + 1];
-                strcpy(name, other.name);
-                strcpy(house, other.house);
+                name = other.name ? new char[strlen(other.name) + 1] : nullptr;
+                house = other.house ? new char[strlen(other.house) + 1] : nullptr;
+                if (name) strcpy(name, other.name);
+                if (house) strcpy(house, other.house);
                 return *this;
             }
 
 
+            // smaller and lower operator overloading for comparison inside the binary search tree
             bool operator>(const Knight& other) const {
                 return braveryScore > other.braveryScore;
             }
