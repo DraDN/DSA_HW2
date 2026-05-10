@@ -13,7 +13,7 @@ namespace RK {
             void insert(const char* name, int braveryScore, unsigned int battlesWon, const char* house) { registry.insert(Knight(name, braveryScore, battlesWon, house)); }
             void insert(const Knight& knight) { registry.insert(knight); }
 
-            bool remove(const char* name);
+            tools::Optional<Knight> remove(const char* name);
             
             void tournamentRankingScroll(std::ostream& os) const;
             void royalProclamationOrder(std::ostream& os) const;

@@ -73,7 +73,11 @@ void tools::BST<T>::findInRange(T min, T max, tools::Queue<T>& result, const BST
 
     if (*node->data < min) findInRange(min, max, result, node->right);
     else if (*node->data > max) findInRange(min, max, result, node->left);
-    else result.enqueue(*node->data);
+    else {
+        findInRange(min, max, result, node->left);
+        result.enqueue(*node->data);
+        findInRange(min, max, result, node->right);
+    }
 }
 
 template <typename T>

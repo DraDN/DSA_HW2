@@ -1,31 +1,31 @@
 #include "RegistryOfKnights.hpp"
 
-bool RK::RegistryOfKnights::remove(const char* name) {
+tools::Optional<RK::Knight> RK::RegistryOfKnights::remove(const char* name) {
     tools::Optional<Knight> search_result = registry.findLinear([&](const Knight& k){
         return strcmp(k.name, name) == 0;
     });
 
-    if (!search_result) return false;
+    if (!search_result) return tools::nullopt;
 
     registry.remove(*search_result);
-    return true;
+    return search_result;
 }
 
 void RK::RegistryOfKnights::tournamentRankingScroll(std::ostream &os) const {
     registry.traverseInOrder([&](const Knight& k){
-        os << k.name << "(" << k.braveryScore << ")" << std::endl;
+        os << k.name << "(" << k.braveryScore << ")\n";
     });
 }
 
 void RK::RegistryOfKnights::royalProclamationOrder(std::ostream &os) const {
     registry.traversePreOrder([&](const Knight& k){
-        os << k.name << "(" << k.battlesWon << ")" << std::endl;
+        os << k.name << "(" << k.battlesWon << ")\n";
     });
 }
 
 void RK::RegistryOfKnights::tributeCollectionOrder(std::ostream &os) const {
     registry.traversePostOrder([&](const Knight& k){
-        os << k.name << "(" << k.battlesWon << ")" << std::endl;
+        os << k.name << "(" << k.battlesWon << ")\n";
     });
 }
 

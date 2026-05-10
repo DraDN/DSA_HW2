@@ -3,6 +3,7 @@
 #include "RegistryOfKnights.hpp"
 
 #include "test_registry.hpp"
+#include <cstring>
 
 int main() {
     RK::RegistryOfKnights registry;
@@ -14,7 +15,7 @@ int main() {
     assert(house_search_results.getSize() == 4);
 
     while (!house_search_results.isEmpty()) {
-        assert(house_search_results.dequeue()->house == "Pendragon");
+        assert(strcmp(house_search_results.dequeue()->house, "Pendragon") == 0);
     }
 
     return 0;
