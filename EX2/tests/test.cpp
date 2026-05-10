@@ -1,4 +1,4 @@
-#include "BST.hpp"
+#include "RegistryOfKnights.hpp"
 
 int main() {
     return 0;

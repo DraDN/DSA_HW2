@@ -180,6 +180,8 @@ template <typename T>
 tools::Optional<T> tools::BST<T>::getLowestCommonAncestor(T value1, T value2, const BSTNode* node) const {
     if (!node) return tools::nullopt;
 
+    if (!node->left && !node->right) return tools::nullopt;
+
     if (value1 < *node->data && value2 < *node->data) return getLowestCommonAncestor(value1, value2, node->left);
     else if (value1 > *node->data && value2 > *node->data) return getLowestCommonAncestor(value1, value2, node->right);
     else return tools::Optional<T>(*node->data);

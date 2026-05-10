@@ -1,6 +1,6 @@
-# add_library(TLM STATIC src/TimeLineManager.cpp)
-# target_include_directories(TLM PUBLIC include)
-# target_link_libraries(TLM PUBLIC TOOLS)
+add_library(RK STATIC src/RegistryOfKnights.cpp)
+target_include_directories(RK PUBLIC include)
+target_link_libraries(RK PUBLIC TOOLS)
 
 add_subdirectory(tests)
 
