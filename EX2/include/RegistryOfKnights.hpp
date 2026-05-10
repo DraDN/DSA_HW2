@@ -26,7 +26,8 @@ namespace RK {
             tools::Optional<Knight> getChampionOfTheRealm() const { return registry.getMax(); }
 
             unsigned int getHeight() const { return registry.getHeight(); }
-            unsigned int getNumberOfLeafs() const { return registry.getNumberOfLeafs(); }
+            // unsigned int getNumberOfLeafs() const { return registry.getNumberOfLeafs(); }
+            void getLeafs(tools::Queue<Knight>& result) const { registry.getLeafs(result); }
             bool isBalanced() const { return registry.isBalanced(); }
 
             tools::Optional<Knight> getKthValoredKnight(unsigned int k) const { return registry.getKthLargest(k); }

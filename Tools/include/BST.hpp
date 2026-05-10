@@ -49,7 +49,7 @@ namespace tools {
             /// @param min The lower bound of the search
             /// @param max The upper bound of the search
             /// @param result A queue to store the found elements
-            void findInRange(T min, T max, tools::Queue<T>& result) const;
+            void findInRange(T min, T max, tools::Queue<T>& result) const { findInRange(min, max, result, root); }
 
             /// @brief Finds the first element that makes the criterion return true
             /// @note This is a linear search and doesn't make use of the tree stucture for efficiency
@@ -106,9 +106,8 @@ namespace tools {
             /// @return The height
             unsigned int getHeight() const { return getHeight(root); }
 
-            /// @brief Gives the number of leafs
-            /// @return The number of leafs
-            unsigned int getNumberOfLeafs() const { return getNumberOfLeafs(root); }
+            /// @brief Gives the leafs of the tree via the `tools::Queue<T> result` queue 
+            void getLeafs(tools::Queue<T>& result) const { return getLeafs(result, root); }
 
             /// @brief Checks if the tree is balanced
             /// @return `true` if the tree is balanced, `false` otherwise
@@ -129,6 +128,7 @@ namespace tools {
             void remove(T value, BSTNode*& node);
 
             tools::Optional<T> find(T value, const BSTNode* node) const;
+            void findInRange(T min, T max, tools::Queue<T>& result, const BSTNode* node) const;
 
             template <typename Func>
             tools::Optional<T> findLinear(Func criterion, const BSTNode* node) const;
@@ -144,7 +144,8 @@ namespace tools {
             tools::Optional<T> getLowestCommonAncestor(T value1, T value2, const BSTNode* node) const;
 
             unsigned int getHeight(const BSTNode* node) const;
-            unsigned int getNumberOfLeafs(const BSTNode* node) const;
+            void getLeafs(tools::Queue<T>& result, const BSTNode* node) const;
+            // unsigned int getNumberOfLeafs(const BSTNode* node) const;
             bool isBalanced(const BSTNode* node) const;
     };
 

@@ -1,5 +1,7 @@
 #include "BST.hpp"
 
+#include <cmath>
+
 template <typename T>
 void tools::BST<T>::destroy(BSTNode* node) {
     if (!node) return;
@@ -35,7 +37,7 @@ void tools::BST<T>::remove(T value, BSTNode*& node) {
 
     else if (node->left && node->right) { // if it has two children
         tools::BST<T>::BSTNode* successor = in_order_successor(node);
-        *node->data = *successor.data;
+        *node->data = *successor->data;
         remove(*successor->data, node->right); // will remove the original successor - rududent since we've copied into the deleted spot
 
     } else { // has only 1 child
@@ -66,12 +68,12 @@ tools::Optional<T> tools::BST<T>::find(T value, const BSTNode* node) const {
 // }
 
 template <typename T>
-void tools::BST<T>::findInRange(T min, T max, tools::Queue<T>& result) const {
-    if (!root) return;
+void tools::BST<T>::findInRange(T min, T max, tools::Queue<T>& result, const BSTNode* node) const {
+    if (!node) return;
 
-    if (*root->data < min) findInRange(min, max, root->right);
-    else if (*root->data > max) findInRange(min, max, root->left);
-    else result.push(*root->data);
+    if (*node->data < min) findInRange(min, max, result, node->right);
+    else if (*node->data > max) findInRange(min, max, result, node->left);
+    else result.enqueue(*node->data);
 }
 
 template <typename T>
@@ -126,12 +128,17 @@ unsigned int tools::BST<T>::getHeight(const BSTNode* node) const {
 }
 
 template <typename T>
-unsigned int tools::BST<T>::getNumberOfLeafs(const BSTNode* node) const {
-    if (!node) return 0;
+// unsigned int tools::BST<T>::getNumberOfLeafs(const BSTNode* node) const {
+void tools::BST<T>::getLeafs(tools::Queue<T>& result, const BSTNode* node) const {
+    if (!node) return;
 
-    if (!node->left && !node->right) return 1; // if it's a leaf
+    if (!node->left && !node->right) {
+        result.enqueue(*node->data); // if it's a leaf
+        return;
+    }
 
-    return getNumberOfLeafs(node->left) + getNumberOfLeafs(node->right);
+    getLeafs(result, node->left);
+    getLeafs(result, node->right);
 }
 
 template <typename T>

@@ -11,6 +11,7 @@ namespace RK {
             char* name = nullptr;
             char* house = nullptr;
 
+            Knight() {}
 
             Knight(const char* name, int braveryScore, unsigned int battlesWon, const char* house) : braveryScore(braveryScore), battlesWon(battlesWon) {
                 this->name = new char[strlen(name) + 1];
