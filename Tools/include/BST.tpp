@@ -15,10 +15,11 @@ void tools::BST<T>::destroy(BSTNode* node) {
 /// ==== I/O ====
 
 template <typename T>
-void tools::BST<T>::insert(T value, BSTNode*& node) {
-    if (!node) node = new BSTNode(value);
-    else if (value < *node->data) insert(value, node->left);
-    else if (value > *node->data) insert(value, node->right);
+bool tools::BST<T>::insert(T value, BSTNode*& node) {
+    if (!node) { node = new BSTNode(value); return true; }
+    else if (value == *node->data) return false;
+    else if (value < *node->data) return insert(value, node->left);
+    else return insert(value, node->right);
 }
 
 /*

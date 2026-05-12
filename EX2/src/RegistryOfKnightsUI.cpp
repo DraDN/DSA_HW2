@@ -9,6 +9,7 @@ void RK::RegistryOfKnightsUI::handleInsert() {
         return;
     }
 
+    int count = 0;
     for (int i = 0; i < n; i++) {
         char name[256], house[256];
         int braveryScore, battlesWon;
@@ -20,10 +21,20 @@ void RK::RegistryOfKnightsUI::handleInsert() {
             return;
         }
 
-        registry.insert(name, braveryScore, battlesWon, house);
+        int insert_result = registry.insert(name, braveryScore, battlesWon, house);
+
+        if (insert_result == 1) {
+            out << "Knight with bravery score " << braveryScore << " already exists!\n";
+            continue;
+        } else if (insert_result == 2) {
+            out << "Knight with name " << name << " already exists!\n";
+            continue;
+        } else {
+            count++;
+        }
     }
 
-    out << "Successfully inserted " << n << " knights!\n";
+    out << "Successfully inserted " << count << " knights!\n";
 }
 
 void RK::RegistryOfKnightsUI::handleRemove() {

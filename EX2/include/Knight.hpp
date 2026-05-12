@@ -58,6 +58,10 @@ namespace RK {
                 return braveryScore < other.braveryScore;
             }
 
+            bool operator==(const Knight& other) const {
+                return braveryScore == other.braveryScore;
+            }
+
     };
 
 }

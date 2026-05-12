@@ -2,7 +2,7 @@ add_executable(TEST test.cpp)
 target_link_libraries(TEST PUBLIC RK)
 
 add_custom_target(
-    run_test_ex1
+    run_test_ex2
     DEPENDS TEST
     COMMAND sh -c "$<TARGET_FILE:TEST><${CMAKE_SOURCE_DIR}/EX2/test.in"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/EX2
