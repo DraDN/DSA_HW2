@@ -45,7 +45,7 @@ namespace rrm {
 
         void displayBlockedAreas(std::ostream& os) const; //D
 
-        void findUnreachableAreas(std::ostream& os) const; //E
+        void findUnreachableAreas(const char* base, std::ostream& os) const; //E
 
         void solvePathForRobot(const Robot& robot, std::ostream& os) const; //F, G
 
