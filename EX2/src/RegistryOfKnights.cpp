@@ -1,6 +1,16 @@
 #include "RegistryOfKnights.hpp"
 
-tools::Optional<RK::Knight> RK::RegistryOfKnights::remove(const char* name) {
+
+int RK::RegistryOfKnights::insert(const char *name, int braveryScore, unsigned int battlesWon, const char *house) {
+    if (registry.findLinear([&](const Knight& k){
+        return strcmp(k.name, name) == 0;
+    })) return 2;
+
+    return (registry.insert(Knight(name, braveryScore, battlesWon, house)) ? 0 : 1);
+}
+
+tools::Optional<RK::Knight> RK::RegistryOfKnights::remove(const char *name)
+{
     tools::Optional<Knight> search_result = registry.findLinear([&](const Knight& k){
         return strcmp(k.name, name) == 0;
     });

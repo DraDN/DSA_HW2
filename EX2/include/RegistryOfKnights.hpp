@@ -18,7 +18,12 @@ namespace RK {
             /// @param braveryScore integer representing the knights order in the registry tree - unique
             /// @param battlesWon integer representing the number of battles the knight has won
             /// @param house string literal of the knights house
-            void insert(const char* name, int braveryScore, unsigned int battlesWon, const char* house) { registry.insert(Knight(name, braveryScore, battlesWon, house)); }
+            /// @return `0` if the knight was inserted,
+            ///
+            /// `1` if the braveryScore isn't unique
+            /// 
+            /// `2` if the name isn't unique
+            int insert(const char* name, int braveryScore, unsigned int battlesWon, const char* house);
 
             /// @brief Inserts a knight into the registry
             /// @param knight the night to be inserted into the registry

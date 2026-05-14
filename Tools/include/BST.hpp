@@ -31,7 +31,10 @@ namespace tools {
 
             /// @brief Inserts an element into the tree
             /// @param value The data/value to insert
-            void insert(T value) { insert(value, root); }
+            /// @return `true` if the value was inserted,
+            ///
+            /// `false` if the value was already in the tree
+            bool insert(T value) { return insert(value, root); }
 
             /// @brief Removes an element from the tree
             /// @param value The data/value to remove
@@ -124,7 +127,7 @@ namespace tools {
             BSTNode* in_order_successor(BSTNode* node);
 
             // private functions to help recursion
-            void insert(T value, BSTNode*& node);
+            bool insert(T value, BSTNode*& node);
             void remove(T value, BSTNode*& node);
 
             tools::Optional<T> find(T value, const BSTNode* node) const;
