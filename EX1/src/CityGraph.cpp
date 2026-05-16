@@ -33,28 +33,55 @@ void rrm::CityGraph::assignCriticalZone(const char* locationName) {
     }
 }
 
+void rrm::CityGraph::printCityMap(std::ostream& os) const {
+    for (int i = 0; i < currentLocationCount; i++) {
+        os << "Location: " << locationList[i].locationName;
+        if (locationList[i].isChargingStation) os << " (Charging Station)";
+        if (locationList[i].isCriticalzone) os << " (Critical Zone)";
+        os << "\n";
+
+        bool hasRoads = false;
+        for (int j = 0; j < currentLocationCount; j++) {
+            if (hasRoute[i][j]) {
+                os << "  -> " << locationList[j].locationName << " (Time: " << routeMatrix[i][j].timeDuration << " min, Risk: " << routeMatrix[i][j].riskLvl << ", Energy Drain: " << routeMatrix[i][j].energyDrain << " units)\n";
+                hasRoads = true;
+            }
+            
+        }
+        if (!hasRoads) {
+            os << "No outgoing roads.\n";
+        } 
+        
+    }
+}
+
 //B
 void rrm::CityGraph::findMostExposedArea(std::ostream& os) const {
-    int maxInDegree = -1;
     int* inDegrees = new int[currentLocationCount];
     for (int i = 0; i < currentLocationCount; i++) {
         inDegrees[i] = 0;
-        for (int j = 0; j < currentLocationCount; j++) {
-            if (hasRoute[j][i]) {
-                if (hasRoute[j][i]) {
-                    inDegrees[i]++;
-                }
-            }
-            if (inDegrees[i] > maxInDegree) {
-                maxInDegree = inDegrees[i];
-            }
-
-        }
     }
 
     for (int i = 0; i < currentLocationCount; i++) {
+        for (int j = 0; j < currentLocationCount; j++) {
+            if (hasRoute[i][j]) {
+                inDegrees[j]++;
+            }
+        }
+
+    }
+
+    int maxInDegree = -1;
+    for (int i = 0; i < currentLocationCount; i++) {
+        if (inDegrees[i] > maxInDegree) {
+            maxInDegree = inDegrees[i];
+        }
+    }
+
+    os << "Most exposed area(s):\n";
+    for (int i = 0; i < currentLocationCount; i++) {
         if (inDegrees[i] == maxInDegree) {
-            os << "Most Exposed Area: " << locationList[i].locationName << " with " << maxInDegree << " incoming roads\n";
+            os << locationList[i].locationName << " with " << maxInDegree << " incoming roads\n";
         }
     }
 
@@ -71,39 +98,44 @@ bool rrm::CityGraph::isGloballyValid() const {
         reachLocations[i] = false;
     }
 
-    bool* visitedLocations = new bool[currentLocationCount];
+    int* visitedLocations = new int[currentLocationCount];
     int head = 0;
     int tail = 0;
 
     reachLocations[0] = true;
     visitedLocations[tail++] = 0;
-    int unifiedAreaCount = 1;
 
     while (head < tail) {
         int currentLocation = visitedLocations[head++];
 
         for (int neighbor = 0; neighbor < currentLocationCount; neighbor++) {
-            bool hasRoad = hasRoute[currentLocation][neighbor] || hasRoute[neighbor][currentLocation];
-
-            if (hasRoute && !reachLocations[neighbor]) {
-                reachLocations[neighbor] = true;
-                visitedLocations[tail++] = neighbor;
-                unifiedAreaCount++;
+            if (!reachLocations[neighbor]) {
+                if (hasRoute[currentLocation][neighbor] || hasRoute[neighbor][currentLocation]) {
+                    reachLocations[neighbor] = true;
+                    visitedLocations[tail++] = neighbor;
+                }
             }
         }
     }
 
-    bool isGloballyValid = (unifiedAreaCount == currentLocationCount);
+    bool componentsGloballyValid = true;
+    for (int i = 0; i < currentLocationCount; i++) {
+        if (!reachLocations[i]) {
+            componentsGloballyValid = false;
+            break;
+        }
+    }
 
     delete[] reachLocations;
     delete[] visitedLocations;
 
-    return isGloballyValid;
+    return componentsGloballyValid;
 
 }
 
 //D
 void rrm::CityGraph::displayBlockedAreas(std::ostream& os) const {
+    os << "Blocked area(s):\n";
     bool hasBlockedAreas = false;
     for (int i = 0; i < currentLocationCount; i++) {
         int inDegree = 0;
@@ -117,14 +149,18 @@ void rrm::CityGraph::displayBlockedAreas(std::ostream& os) const {
                 outDegree++;
             }
         }
-        if (inDegree == 0 && outDegree > 0) {
-            os << locationList[i].locationName << "\n";
+        if (inDegree > 0 && outDegree == 0) {
+            if (hasBlockedAreas) {
+                os << ", ";
+            }
+            os << locationList[i].locationName;
             hasBlockedAreas = true;
         }
     }
     if (!hasBlockedAreas) {
         os << "No blocked areas found.\n";
     }
+    os << std::endl;
 }
 
 //E
@@ -158,17 +194,22 @@ void rrm::CityGraph::findUnreachableAreas(const char* base, std::ostream& os) co
         }
     }
 
-    bool allReachableAreas = true;
+    bool allUneachableAreas = false;
+    os << "From base " << base << ", the following areas are unreachable: ";
     for (int i = 0; i < currentLocationCount; i++) {
         if (!visited[i]) {
-            os << "Unreachable Area: " << locationList[i].locationName << "\n";
-            allReachableAreas = false;
+            if (allUneachableAreas) {
+                os << ", ";
+            }
+            os << locationList[i].locationName;
+            allUneachableAreas = true;
         }
     }
 
-    if (allReachableAreas) {
+    if (!allUneachableAreas) {
         os << "All areas are reachable from the base location.\n";
     }
+    os << std::endl;
 
     delete[] visited;
     delete[] traversalPipeline;
@@ -177,201 +218,132 @@ void rrm::CityGraph::findUnreachableAreas(const char* base, std::ostream& os) co
 
 //F, G
 void rrm::CityGraph::solvePathForRobot(const Robot& robot, std::ostream& os) const {
-        robot.deploymentPoint;
-        robot.autonomyEnergy;
-        robot.maximumRisk;
 
-        int startIndex = findLocationIndex(robot.deploymentPoint);
-        if (startIndex == -1) {
-            os << "No valid direct path to a critical zone.\n";
-            os << "No valid solution even with recharging.\n";
-            return;
-        }
+    int startLocationIndex = findLocationIndex(robot.deploymentPoint);
+    if (startLocationIndex == -1) return;
 
-        //Djikstra
-        int* minimumTimeCost = new int[currentLocationCount];
-        int* energyDrainage = new int[currentLocationCount];
-        int* pathPredecessor = new int[currentLocationCount];
-        bool* trackerVisitedLocations = new bool[currentLocationCount];
-
-        auto executeDjikstraAlgorithm = [&](int startIndex) {
-            for (int i = 0; i < currentLocationCount; i++) {
-                minimumTimeCost[i] = INT_MAX;
-                energyDrainage[i] = 0;
-                pathPredecessor[i] = -1;
-                trackerVisitedLocations[i] = false;
-            }
-
-            minimumTimeCost[startIndex] = 0;
-            energyDrainage[startIndex] = 0;
-
-            for (int countCost = 0; countCost < currentLocationCount - 1; countCost++) {
-                int minCostVertex = -1;
-                int minCostValue = INT_MAX;
-
-                for (int vertexLocation = 0; vertexLocation < currentLocationCount; vertexLocation++) {
-                    if (!trackerVisitedLocations[vertexLocation] && minimumTimeCost[vertexLocation] < minCostValue) {
-                        minCostValue = minimumTimeCost[vertexLocation];
-                        minCostVertex = vertexLocation;
-                    }
-                }
-
-                if (minCostVertex == -1) break;
-
-                trackerVisitedLocations[minCostVertex] = true;
-
-                for (int neighbor = 0; neighbor < currentLocationCount; neighbor++) {
-                    if (hasRoute[minCostVertex][neighbor]) {
-                        const Road& roadToNeighbor = routeMatrix[minCostVertex][neighbor];
-
-                        if (!trackerVisitedLocations[neighbor] && minimumTimeCost[minCostVertex] != INT_MAX) {
-                            int potentialTimeCost = minimumTimeCost[minCostVertex] + roadToNeighbor.timeDuration;
-
-                            if (potentialTimeCost < minimumTimeCost[neighbor]) {
-                                minimumTimeCost[neighbor] = potentialTimeCost;
-                                energyDrainage[neighbor] = energyDrainage[minCostVertex] + roadToNeighbor.energyDrain;
-                                pathPredecessor[neighbor] = minCostVertex;
-                            }
-
-                        }
-                    }
-                }
-            }
-        };
-    //F
-    executeDjikstraAlgorithm(startIndex);
-
-    int bestCriticalZoneIndex = -1;
-    int bestTimeCost = INT_MAX;
+    int* minimumTimeCost = new int[currentLocationCount];
+    int* energyDrainage = new int[currentLocationCount];
+    int* pathPredecessor = new int[currentLocationCount];
+    bool* trackerVisitedLocations = new bool[currentLocationCount];
 
     for (int i = 0; i < currentLocationCount; i++) {
-        if (locationList[i].isCriticalzone && minimumTimeCost[i] != INT_MAX) {
-            if (energyDrainage[i] <= robot.autonomyEnergy && minimumTimeCost[i] < bestTimeCost) {
+        minimumTimeCost[i] = INT_MAX;
+        energyDrainage[i] = INT_MAX;
+        pathPredecessor[i] = -1;
+        trackerVisitedLocations[i] = false;
+    }
+
+    minimumTimeCost[startLocationIndex] = 0;
+    energyDrainage[startLocationIndex] = 0;
+
+    for (int countCost = 0; countCost < currentLocationCount - 1; countCost++) {
+        int minCostVertex = -1;
+        int minCostValue = INT_MAX;
+
+        for (int vertexLocation = 0; vertexLocation < currentLocationCount; vertexLocation++) {
+            if (!trackerVisitedLocations[vertexLocation] && minimumTimeCost[vertexLocation] < minCostValue) {
+                minCostValue = minimumTimeCost[vertexLocation];
+                minCostVertex = vertexLocation;
+            }
+        }
+
+        if (minCostVertex == -1 || minimumTimeCost[minCostValue == INT_MAX]) break;
+        trackerVisitedLocations[minCostVertex] = true;
+
+        for (int neighbor = 0; neighbor < currentLocationCount; neighbor++) {
+                if (hasRoute[minCostVertex][neighbor] && !trackerVisitedLocations[neighbor]) {
+                    const Road& roadToNeighbor = routeMatrix[minCostVertex][neighbor];
+
+                    if(roadToNeighbor.riskLvl <= robot.maximumRisk){
+                        int evaluatedEnergy = energyDrainage[minCostVertex] + roadToNeighbor.timeDuration;
+
+                        if (evaluatedEnergy <= robot.autonomyEnergy) {
+                            int potentialTime = minimumTimeCost[minCostVertex] + roadToNeighbor.timeDuration;
+
+                            if (potentialTime < minimumTimeCost[neighbor] || (potentialTime == minimumTimeCost[neighbor] && evaluatedEnergy < energyDrainage[neighbor])) {
+                                minimumTimeCost[neighbor] = potentialTime;
+                                energyDrainage[neighbor] = evaluatedEnergy;
+                                pathPredecessor[neighbor] = minCostVertex;
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        
+
+    }
+
+    //F
+    int bestCriticalZoneIndex = -1;
+    int bestTimeCost = INT_MAX;
+    int bestEnergyCost = INT_MAX;
+
+    for (int i = 0; i < currentLocationCount; i++) {
+        if (locationList[i].isCriticalzone && minimumTimeCost[i] != INF) {
+            if (minimumTimeCost[i] < bestTimeVCost || (minimumTimeCost[i] == bestTimeCost && energyDrainage[i] < bestEnergyCost)) {
                 bestTimeCost = minimumTimeCost[i];
+                bestEnergyCost = energyDrainage[i];
                 bestCriticalZoneIndex = i;
             }
         }
-        
     }
-
+    
     if (bestCriticalZoneIndex != -1) {
-        os << "Optimal path to critical zone: \n";
-
-        int* pathStackSequence = new int[currentLocationCount];
-        int* segmentCount = 0;
-        int traceVertexIndex = bestCriticalZoneIndex;
-
-        while (traceVertexIndex != -1) {
-            pathStackSequence[*(segmentCount)++] = traceVertexIndex;
-            traceVertexIndex = pathPredecessor[traceVertexIndex];
+        os < "Optimal direct path to a critical zone: \n";
+        int* traceBuffer = new int[currentLocationCount];
+        int hopsCrZn= 0;
+        int currentCrZn = bestCriticalZoneIndex;
+        while (currentCrZn != -1) {
+            traceBuffer[hopsCrZn++] = currentCrZn;
+            currentCrZn = pathPredecessor[currentCrZn];
         }
 
-        for (int i = (*segmentCount) - 1; i >= 0; i--) {
-            os << locationList[pathStackSequence[i]].locationName;
-            if (i > 0) {
-                os << " -> ";
-            }
+        for (int i = hopsCrZn -1; i >= 0; i--) {
+            os << loctionList[traceBuffer[i]].locationName;
+            if (i > 0) os << " -> ";
         }
+        
+        os << "\nTotal travel time: " << bestTimeCost << "\n";
+        os << "Energy consumed " << bestEnergyCost << "\n";
+        os << "Critical zone reached: " << locationList[bestCriticalZoneIndex].locationName << "\n";
 
-        os << "\nTotal Time: " << bestTimeCost << " minutes\n";
-        os << "Total Energy Drain: " << energyDrainage[bestCriticalZoneIndex] << " units\n";
-        os << "critical zone reached: " << locationList[bestCriticalZoneIndex].locationName << "\n";
+        delete[] traceBuffer;
 
-        delete[] pathStackSequence;
-
-    }
-    else {
-        //G
+    } else {
         os << "No valid direct path to a critical zone.\n";
 
-        int bestRechargeZoneIndex = -1;
-        int absoluteBestTotalTime = INT_MAX;
-        int totalEnergyforBestPath = 0;
+        int globalBestTime = INT_MAX;
+        int optimalStationIndex = -1;
+        int optimalTargetIndex = -1;
+        int optimalEnergyPtI = INT_MAX;
+        int optimalEnergyPtII = INT_MAX;
 
-        for (int rechargeIndex = 0; rechargeIndex < currentLocationCount; rechargeIndex++) {
-            if (locationList[rechargeIndex].isChargingStation && minimumTimeCost[rechargeIndex] != INT_MAX) {
-                int timeToRecharge = minimumTimeCost[rechargeIndex];
-                int energyToRecharge = energyDrainage[rechargeIndex];
+        for (int localStation = 0; localStation < currentLocalCount; localStation++) {
+            if (!locationList[localStation].isChargingStation || minimumTimeCost[localStation] == INT_MAX) continue;
 
-                int* intermediateParents = new int[currentLocationCount];
-                for (int i = 0; i < currentLocationCount; i++) {
-                    intermediateParents[i] = pathPredecessor[i];
-                }
+           /*int timeToStation = minTime[station];
+            int energyToStation = energyCost[station];
 
-                executeDjikstraAlgorithm(rechargeIndex);
+            int* subTime = new int[currentLocationCount];
+            int* subEnergy = new int[currentLocationCount];
+            bool* subProcessed = new bool[currentLocationCount];
 
-                for ( int targetCriticalIndex = 0; targetCriticalIndex < currentLocationCount; targetCriticalIndex++) {
-                    if (locationList[targetCriticalIndex].isCriticalzone && minimumTimeCost[targetCriticalIndex] != INT_MAX) {
-                        int timeFromRechargeToCritical = timeToRecharge + minimumTimeCost[targetCriticalIndex];
-
-                        if (timeFromRechargeToCritical < absoluteBestTotalTime) {
-                            absoluteBestTotalTime = timeFromRechargeToCritical;
-                            bestRechargeZoneIndex = rechargeIndex;
-                            totalEnergyforBestPath = energyToRecharge + energyDrainage[targetCriticalIndex];
-                        }
-                    }
-                }
-                delete[] intermediateParents;
+            for (int i = 0; i < currentLocationCount; i++) {
+                subTime[i] = INF;
+                subEnergy[i] = INF;
+                subProcessed[i] = false;
             }
+
+            subTime[station] = 0;
+            subEnergy[station] = 0; */
+
         }
-
-        if (bestRechargeZoneIndex != -1 && bestRechargeZoneIndex != -1) {
-            os << "Optimal path with recharging: \n";
-
-
-            executeDjikstraAlgorithm(startIndex);
-            int* pathRechargeSequence = new int[currentLocationCount];
-            int* segmentCountRecharge = 0;
-            int traceVertexIndexRecharge = bestRechargeZoneIndex;
-
-            while (traceVertexIndexRecharge != -1) {
-                pathRechargeSequence[(*segmentCountRecharge)++] = traceVertexIndexRecharge;
-                traceVertexIndexRecharge = pathPredecessor[traceVertexIndexRecharge];
-            }
-
-            executeDjikstraAlgorithm(bestRechargeZoneIndex);
-            int* pathCriticalSequence = new int[currentLocationCount];
-            int* segmentCountCritical = 0;
-            int traceVertexIndexCritical = bestRechargeZoneIndex;
-
-            while (traceVertexIndexCritical != -1) {
-                pathCriticalSequence[(*segmentCountCritical)++] = traceVertexIndexCritical;
-                traceVertexIndexCritical = pathPredecessor[traceVertexIndexCritical];
-            }
-
-            for (int i = (*segmentCountRecharge) - 1; i >= 0; i--) {
-                os << locationList[pathRechargeSequence[i]].locationName << "->";
-            }
-            for (int i = (*segmentCountCritical) - 2; i >= 0; i--) {
-                os << locationList[pathCriticalSequence[i]].locationName;
-                if (i > 0) {
-                    os << " -> ";   
-                }
-            }
-
-            os << "\nTotal Time: " << absoluteBestTotalTime << " minutes\n";
-            os << "Total Energy Drain: " << totalEnergyforBestPath << " units\n";
-            os << "critical zone reached: " << locationList[bestRechargeZoneIndex].locationName << "\n";
-
-            delete[] pathRechargeSequence;
-            delete[] pathCriticalSequence;
-        }
-        else {
-            os << "No valid solution even with recharging.\n";
-        }
-        
     }
-
-    delete[] minimumTimeCost;
-    delete[] energyDrainage;
-    delete[] pathPredecessor;
-    delete[] trackerVisitedLocations;
-
-
 }
-
-
-
+        
 
 
 

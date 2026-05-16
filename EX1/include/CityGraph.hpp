@@ -38,6 +38,7 @@ namespace rrm {
         void insertRoute(const char* fromLocation, const char* toLocation, int timeDuration, int riskLvl, int energyDrain);
         void assignChargingStation(const char* locationName);
         void assignCriticalZone(const char* locationName);
+        void printCityMap(std::ostream& os) const;
 
         void findMostExposedArea(std::ostream& os) const; //B
 
@@ -68,8 +69,6 @@ namespace rrm {
         int capacity;
         int currentLocationCount;
 
-        Robot* squadRobots;
-        int squadSize;
 
     };
 }

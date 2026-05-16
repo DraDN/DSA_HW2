@@ -101,6 +101,43 @@ namespace rrm {
             delete[] roadLinks;
         }
 
+        Area(const Area& other) {
+            isChargingStation = other.isChargingStation;
+            isCriticalzone = other.isCriticalzone;
+            numberRoadLinks = other.numberRoadLinks;
+            locationName = other.locationName ? new char[strlen(other.locationName) + 1] : nullptr; 
+            if (locationName) strcpy(locationName, other.locationName);
+            if(other.roadLinks && other.numberRoadLinks > 0) {
+                roadLinks = new Road[other.numberRoadLinks];
+                for (int i = 0; i < other.numberRoadLinks; i++) {
+                    roadLinks[i] = other.roadLinks[i];
+                }
+            } else {
+                roadLinks = nullptr;
+            }
+        }
+
+        Area& operator=(const Area& other) {
+            if (this != &other) { 
+                delete[] locationName;
+                delete[] roadLinks;
+                isChargingStation = other.isChargingStation;
+                isCriticalzone = other.isCriticalzone;
+                numberRoadLinks = other.numberRoadLinks;
+                locationName = other.locationName ? new char[strlen(other.locationName) + 1] : nullptr;
+                if (locationName) strcpy(locationName, other.locationName);
+                if(other.roadLinks && other.numberRoadLinks > 0) {
+                    roadLinks = new Road[other.numberRoadLinks];
+                    for (int i = 0; i < other.numberRoadLinks; i++) {
+                        roadLinks[i] = other.roadLinks[i];
+                    }
+                } else {
+                    roadLinks = nullptr;
+                }
+            }
+            return *this;
+        }
+
 
     };
 
