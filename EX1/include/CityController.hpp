@@ -22,6 +22,7 @@ namespace rrm {
             void handleDisplayBlockedAreas();
             void handleFindUnreachableAreas();
             void handleSolvePathForRobot();
+            void handleSolvePathForRobots(int countRobots);
 
 
         private:

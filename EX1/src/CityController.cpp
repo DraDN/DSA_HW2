@@ -8,7 +8,7 @@ void rrm::CityController::handleInsertLocation(int countLocation) {
     }
 
     for (int i = 0; i < countLocation; i++) {
-        out << "Enter location name: ";
+        out << "Location " << (i + 1) << " of " << countLocation << " name: ";
         char locationName[100];
         in.getline(locationName, 100);
         cityGraph.insertLocation(locationName);
@@ -22,7 +22,7 @@ void rrm::CityController::handleInsertRoute(int countRoute) {
     }
 
     for (int i = 0; i < countRoute; i++) {
-        out << "Enter route details (from -> to time risk energy): ";
+        out << "Route " << (i + 1) << " of " << countRoute << " (from to time risk energy): ";
         char fromLocation[100], toLocation[100];
         int timeDuration, riskLvl, energyDrain;
         in >> fromLocation >> toLocation >> timeDuration >> riskLvl >> energyDrain;
@@ -38,7 +38,7 @@ void rrm::CityController::handleAssignChargingStation(int countChargingSt) {
     }
 
     for (int i = 0; i < countChargingSt; i++) {
-        out << "Enter location name for charging station: ";
+        out << "Charging station " << (i + 1) << " of " << countChargingSt << " location name: ";
         char locationName[100];
         in.getline(locationName, 100);
         cityGraph.assignChargingStation(locationName);
@@ -52,7 +52,7 @@ void rrm::CityController::handleAssignCriticalZone(int countCriticalZn) {
     }
 
     for (int i = 0; i < countCriticalZn; i++) {
-        out << "Enter location name for critical zone: ";
+        out << "Critical zone " << (i + 1) << " of " << countCriticalZn << " location name: ";
         char locationName[100];
         in.getline(locationName, 100);
         cityGraph.assignCriticalZone(locationName);
@@ -73,8 +73,9 @@ void rrm::CityController::handleCheckGlobalValidity() {
     if (cityGraph.isGloballyValid()) {
         out << "The network is valid when the road directions are ignored." << std::endl;
     } else {
-        out << "The network is nod valid, disconnected components found." << std::endl;
+        out << "The network is not valid, disconnected components found." << std::endl;
     }
+    out << std::endl;
 }
 
 void rrm::CityController::handleDisplayBlockedAreas() {
@@ -85,12 +86,14 @@ void rrm::CityController::handleDisplayBlockedAreas() {
 void rrm::CityController::handleFindUnreachableAreas() {
     out << "Enter base location name: ";
     char baseLocation[100];
-    in.getline(baseLocation, 100);
+    in >> baseLocation;
+    in.ignore();
     cityGraph.findUnreachableAreas(baseLocation, out);
     out << std::endl;
 }
 
 void rrm::CityController::handleSolvePathForRobot() {
+    out << "Enter deployment point, autonomy energy, max risk: ";
     char deploymentPoint[100];
     int autonomyEnergy, maximumRisk;
     if (in >> deploymentPoint >> autonomyEnergy >> maximumRisk) {
@@ -99,4 +102,23 @@ void rrm::CityController::handleSolvePathForRobot() {
         cityGraph.solvePathForRobot(robot, out);
     }
     out << std::endl;
+}
+
+void rrm::CityController::handleSolvePathForRobots(int count) {
+    for (int robotNr = 0; robotNr < count; robotNr++) {
+        out << " Robot " << (robotNr + 1) << " of " << count
+            << " (start   autonomy   max risk): ";
+        char deploymentPoint[100];
+        int autonomyEnergy, maximumRisk;
+        if (in >> deploymentPoint >> autonomyEnergy >> maximumRisk) {
+            in.ignore();
+            out << "Robot " << (robotNr + 1) << ":\n";
+            out << "Initial position: " << deploymentPoint << "\n";
+            out << "Autonomy: " << autonomyEnergy << "\n";
+            out << "Maximum accepted risk: " << maximumRisk << "\n";
+            Robot robot(deploymentPoint, autonomyEnergy, maximumRisk);
+            cityGraph.solvePathForRobot(robot, out);
+        }
+        out << std::endl;
+    }
 }

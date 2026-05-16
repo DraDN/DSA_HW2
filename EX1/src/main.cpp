@@ -1,6 +1,7 @@
 #include "RobotRoadModel.hpp"
 #include "CityGraph.hpp"
 #include "CityController.hpp"
+#include <sstream>
 
 int main() {
     rrm::CityGraph cityCapacityLocations(50);
@@ -10,21 +11,48 @@ int main() {
     if(!(std::cin >> totalCityLocations >> totalCityRoutes)) return 0;
     std::cin.ignore();
 
-    controllerCity.handleInsertLocation(totalCityLocations);
+    {
+        std::string location;
+        std::getline(std::cin, location);
+        std::istringstream iss(location);
+        std::string name;
+        while (iss >> name) {
+            cityCapacityLocations.insertLocation(name.c_str());
+        }
+
+    }
+
     controllerCity.handleInsertRoute(totalCityRoutes);
+    
+    {
+        int charginStationVertex;
+        std::cin >> charginStationVertex;
+        std::cin.ignore();
+        std::string station;
+        std::getline(std::cin, station);
+        std::istringstream iss(station);
+        std::string name;
+        while (iss >> name) {
+            cityCapacityLocations.assignChargingStation(name.c_str());
+        }
+    }
+
+    {
+        int criticalZonevertex;
+        std::cin >> criticalZonevertex;
+        std::cin.ignore();
+        std::string target;
+        std::getline(std::cin, target);
+        std::istringstream iss(target);
+        std::string name;
+        while (iss >> name) {
+            cityCapacityLocations.assignCriticalZone(name.c_str());
+        }
 
 
-    int totalCityChargingStations;
-    std::cin >> totalCityChargingStations;
-    std::cin.ignore();
-    controllerCity.handleAssignChargingStation(totalCityChargingStations);
+    }
 
-
-    int totalCityCriticalZone;
-    std::cin >> totalCityCriticalZone;
-    std::cin.ignore();
-    controllerCity.handleAssignCriticalZone(totalCityCriticalZone);
-
+    controllerCity.printCityMap();
 
     controllerCity.handleFindMostExposedArea();
 
@@ -32,9 +60,15 @@ int main() {
 
     controllerCity.handleDisplayBlockedAreas();
 
+    int robotsCount;
+    std::cin >> robotsCount;
+    std::cin.ignore();
+
+    controllerCity.handleSolvePathForRobots(robotsCount);
+
     controllerCity.handleFindUnreachableAreas();
 
-    controllerCity.handleSolvePathForRobot();
+    
 
     return 0;
 }
