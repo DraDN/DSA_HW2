@@ -35,6 +35,9 @@ void RK::RegistryOfKnightsUI::handleInsert() {
     }
 
     out << "Successfully inserted " << count << " knights!\n";
+
+    out << "\nRegistry after insertion (in-order):\n";
+    registry.printFullTree(out);
 }
 
 void RK::RegistryOfKnightsUI::handleRemove() {
