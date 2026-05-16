@@ -160,63 +160,139 @@ This exercise implements a record system called the "Registry of Knights" to man
 ### Implementation Details
 
 - Built using clean custom structures (***Knight***) managing manual heap allocation safely with copy constructors and assignment operator overloads to prevent memory leaks
-- Uses a stream-driven UI interface (RegistryOfKnightsUI) to read values directly from standard inputs and handle error tracking seamlessly
+- Uses a generic interface (RegistryOfKnightsUI), used for seamless integration of the library in applications
+- A test is provided that reads from the `./EX2/test.in` file and runs through each feature, displaying the output in the console
 
 ### Example
 
-INPUT
+INPUT (`test.in`)
 
 ```
-5   //Number of knights to insert
-Arthur 50 Pendragon 12
-Galahad 30 Pure 8
-Lancelot 70 Lake 15
-Gawain 20 Orkney 5
-Percival 40 Quest 6
-In-order   // Print tournament ranking
-House Pure   // Search all knights in House Pure
-Range 25 55    // Search bravery scores between 25 and 55
-Champion   // Find the highest bravery knight
-Kth 2   // Find the 2nd valored knight
-LCA Gawain Percival   // Find Lowest Common Ancestor for these two
-Remove Percival   // Delete Percival from records
-Info   //Display final archive statistics
+10 // Number of knights ot insert
+Arthur 50 Pendragon 30
+Lancelot 30 Lionel 45
+Gawain 70 Pendragon 22
+Percival 20 Fisher 15
+Tristan 40 Cornwall 28
+Galahad 60 Lionel 38
+Bedivere 80 Pendragon 19
+Bors 25 Lionel 12
+Gareth 55 Pendragon 17
+Lamorak 35 Cornwall 33
+// automatically prints in-order, pre-order and post-order
+Pendragon // Search all knights in house Pendragon
+// automatically display the knight with lowest and highest bravery score
+// automatically display registry info (height, leafs and if it's balanced)
+25 60 // Search for knights with bravery scores between 25 adn 60
+3 // Find the 3rd most valored knight
+Bors Lamorak // Find the Lowest Common Ancestor of Bors and Lamorak
+Tristan // Delete Tristan from the records
 
 ```
 OUTPUT
 ```
-Successfully inserted 5 knights!
+=== 1 ===
+Successfully inserted 10 knights!
 
+Registry after insertion (in-order):
+Percival | bravery: 20 | House Fisher | 15 battles
+Bors | bravery: 25 | House Lionel | 12 battles
+Lancelot | bravery: 30 | House Lionel | 45 battles
+Lamorak | bravery: 35 | House Cornwall | 33 battles
+Tristan | bravery: 40 | House Cornwall | 28 battles
+Arthur | bravery: 50 | House Pendragon | 30 battles
+Gareth | bravery: 55 | House Pendragon | 17 battles
+Galahad | bravery: 60 | House Lionel | 38 battles
+Gawain | bravery: 70 | House Pendragon | 22 battles
+Bedivere | bravery: 80 | House Pendragon | 19 battles
+
+=== 2 ===
 In-order (Tournament Ranking):
-Gawain(20)
-Galahad(30)
-Percival(40)
+Percival(20)
+Bors(25)
+Lancelot(30)
+Lamorak(35)
+Tristan(40)
 Arthur(50)
-Lancelot(70)
+Gareth(55)
+Galahad(60)
+Gawain(70)
+Bedivere(80)
 
-Knights of House Pure:
-Galahad | bravery: 30 | 8 battles won
+Pre-order (Royal Proclamation):
+Arthur(30)
+Lancelot(45)
+Percival(15)
+Bors(12)
+Tristan(28)
+Lamorak(33)
+Gawain(22)
+Galahad(38)
+Gareth(17)
+Bedivere(19)
 
-Knights in range 25 to 55:
-Galahad | bravery: 30
-Percival | bravery: 40
-Arthur | bravery: 50
+Post-order (Tribute Collection):
+Bors(12)
+Percival(15)
+Lamorak(33)
+Tristan(28)
+Lancelot(45)
+Gareth(17)
+Galahad(38)
+Bedivere(19)
+Gawain(22)
+Arthur(30)
 
-Champion of the Realm:
-Lancelot | bravery: 70 | House Lake | 15 battles
 
-2th valored knight: Galahad | bravery: 30 | House Pure | 8 battles
+=== 3 ===
+Knights from house Pendragon:
+Arthur | bravery: 50 | battles won: 30
+Gareth | bravery: 55 | battles won: 17
+Gawain | bravery: 70 | battles won: 22
+Bedivere | bravery: 80 | battles won: 19
 
-LCA of Gawain and Percival:
-Galahad | bravery: 30
+Newest Recruit (lowest bravery): Percival | bravery: 20 | Fisher | 15 battles
 
-Successfully removed Percival!
+Champion of the Realm (highest bravery): Bedivere | bravery: 80 | Pendragon | 19 battles
 
-Height of the Archive: 3
-Leaf nodes (knights without children):
-Gawain(20)
-The archive is balanced.
+=== 4 ===
+Height of the Archive: 4
+Leaf nodes (knights with no subordinates): 4
+Bors (25), Lamorak (35), Gareth (55), Bedivere (80), 
+The Archive is balanced.
 
+=== 5 ===
+Knights with bravery in [25, 60]:
+
+Bors (25) | House Lionel | 12 battles
+Lancelot (30) | House Lionel | 45 battles
+Lamorak (35) | House Cornwall | 33 battles
+Tristan (40) | House Cornwall | 28 battles
+Arthur (50) | House Pendragon | 30 battles
+Gareth (55) | House Pendragon | 17 battles
+Galahad (60) | House Lionel | 38 battles
+
+Total battles won by knights in range: 203
+
+=== 6 ===
+3th valored knight: Galahad | bravery: 60 | House Lionel | 38 battles
+
+LCA of Bors and Lamorak:
+Lancelot | bravery: 30
+
+=== 7 ===
+Tristan (bravery: 40) has been banished from the Registry.
+
+Registry after banishment:
+Percival(20)
+Bors(25)
+Lancelot(30)
+Lamorak(35)
+Arthur(50)
+Gareth(55)
+Galahad(60)
+Gawain(70)
+Bedivere(80)
 ```
 
 ## How to Compile and Run
@@ -234,9 +310,9 @@ This will run the city map simulation. It automatically reads a list of location
 
 Or:
 
-`cmake --build build --target run_ex2`
+`cmake --build build --target run_test_ex2`
 
-This will run the tournament registry. It sets up an interactive menu system that listens to live console keywords (like In-order, Champion, LCA, or Remove) so you can search, modify, and manage knights inside the binary tree in real-time.
+This will build the library and run a comprehensive test of all of the features.
 
 ## Notes
 
