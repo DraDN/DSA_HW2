@@ -94,7 +94,7 @@ void rrm::CityController::handleSolvePathForRobot() {
     char deploymentPoint[100];
     int autonomyEnergy, maximumRisk;
     if (in >> deploymentPoint >> autonomyEnergy >> maximumRisk) {
-        in.ignore(); // Clear newline
+        in.ignore();
         Robot robot(deploymentPoint, autonomyEnergy, maximumRisk);
         cityGraph.solvePathForRobot(robot, out);
     }

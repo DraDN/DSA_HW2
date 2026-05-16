@@ -248,7 +248,7 @@ void rrm::CityGraph::solvePathForRobot(const Robot& robot, std::ostream& os) con
             }
         }
 
-        if (minCostVertex == -1 || minimumTimeCost[minCostValue == INT_MAX]) break;
+        if (minCostVertex == -1 || minimumTimeCost[minCostVertex] == INT_MAX) break;
         trackerVisitedLocations[minCostVertex] = true;
 
         for (int neighbor = 0; neighbor < currentLocationCount; neighbor++) {
@@ -256,7 +256,7 @@ void rrm::CityGraph::solvePathForRobot(const Robot& robot, std::ostream& os) con
                     const Road& roadToNeighbor = routeMatrix[minCostVertex][neighbor];
 
                     if(roadToNeighbor.riskLvl <= robot.maximumRisk){
-                        int evaluatedEnergy = energyDrainage[minCostVertex] + roadToNeighbor.timeDuration;
+                        int evaluatedEnergy = energyDrainage[minCostVertex] + roadToNeighbor.energyDrain;
 
                         if (evaluatedEnergy <= robot.autonomyEnergy) {
                             int potentialTime = minimumTimeCost[minCostVertex] + roadToNeighbor.timeDuration;
@@ -272,18 +272,14 @@ void rrm::CityGraph::solvePathForRobot(const Robot& robot, std::ostream& os) con
                 }
             }
         }
-        
-
-    }
-
     //F
     int bestCriticalZoneIndex = -1;
     int bestTimeCost = INT_MAX;
     int bestEnergyCost = INT_MAX;
 
     for (int i = 0; i < currentLocationCount; i++) {
-        if (locationList[i].isCriticalzone && minimumTimeCost[i] != INF) {
-            if (minimumTimeCost[i] < bestTimeVCost || (minimumTimeCost[i] == bestTimeCost && energyDrainage[i] < bestEnergyCost)) {
+        if (locationList[i].isCriticalzone && minimumTimeCost[i] != INT_MAX) {
+            if (minimumTimeCost[i] < bestTimeCost || (minimumTimeCost[i] == bestTimeCost && energyDrainage[i] < bestEnergyCost)) {
                 bestTimeCost = minimumTimeCost[i];
                 bestEnergyCost = energyDrainage[i];
                 bestCriticalZoneIndex = i;
@@ -292,7 +288,7 @@ void rrm::CityGraph::solvePathForRobot(const Robot& robot, std::ostream& os) con
     }
     
     if (bestCriticalZoneIndex != -1) {
-        os < "Optimal direct path to a critical zone: \n";
+        os << "Optimal direct path to a critical zone: \n";
         int* traceBuffer = new int[currentLocationCount];
         int hopsCrZn= 0;
         int currentCrZn = bestCriticalZoneIndex;
@@ -302,7 +298,7 @@ void rrm::CityGraph::solvePathForRobot(const Robot& robot, std::ostream& os) con
         }
 
         for (int i = hopsCrZn -1; i >= 0; i--) {
-            os << loctionList[traceBuffer[i]].locationName;
+            os << locationList[traceBuffer[i]].locationName;
             if (i > 0) os << " -> ";
         }
         
@@ -321,30 +317,92 @@ void rrm::CityGraph::solvePathForRobot(const Robot& robot, std::ostream& os) con
         int optimalEnergyPtI = INT_MAX;
         int optimalEnergyPtII = INT_MAX;
 
-        for (int localStation = 0; localStation < currentLocalCount; localStation++) {
+        for (int localStation = 0; localStation < currentLocationCount; localStation++) {
             if (!locationList[localStation].isChargingStation || minimumTimeCost[localStation] == INT_MAX) continue;
 
-           /*int timeToStation = minTime[station];
-            int energyToStation = energyCost[station];
+           int timeToStation = minimumTimeCost[localStation];
+            int energyToStation = energyDrainage[localStation];
 
             int* subTime = new int[currentLocationCount];
             int* subEnergy = new int[currentLocationCount];
             bool* subProcessed = new bool[currentLocationCount];
 
             for (int i = 0; i < currentLocationCount; i++) {
-                subTime[i] = INF;
-                subEnergy[i] = INF;
+                subTime[i] = INT_MAX;
+                subEnergy[i] = INT_MAX;
                 subProcessed[i] = false;
             }
 
-            subTime[station] = 0;
-            subEnergy[station] = 0; */
+            subTime[localStation] = 0;
+            subEnergy[localStation] = 0; 
 
+            for (int countCost = 0 ; countCost < currentLocationCount; countCost++) {
+                int minCostVertex = -1;
+                int minimumTime = INT_MAX;
+                for ( int i = 0; i < currentLocationCount; i++) {
+                    if (!subProcessed[i] && subTime[i] < minimumTime) {
+                        minimumTime = subTime[i];
+                        minCostVertex = i;
+
+                    }
+                }
+
+                if (minCostVertex == -1 || subTime[minCostVertex] == INT_MAX) break;
+                subProcessed[minCostVertex] = true;
+
+                for ( int vertexLocation = 0; vertexLocation < currentLocationCount; vertexLocation++) {
+                    if (hasRoute[minCostVertex][vertexLocation] && !subProcessed[vertexLocation]) {
+                        const Road& roadToNeighbor = routeMatrix[minCostVertex][vertexLocation];
+                        if (roadToNeighbor.riskLvl <= robot.maximumRisk) {
+                            int evaluatedEnergy = subEnergy[minCostVertex] + roadToNeighbor.energyDrain;
+
+                            if(evaluatedEnergy <= robot.autonomyEnergy) {
+                                int potentialTime = subTime[minCostVertex] + roadToNeighbor.timeDuration;
+
+                                if(potentialTime < subTime[vertexLocation] || (potentialTime == subTime[vertexLocation] && evaluatedEnergy < subEnergy[vertexLocation])) {
+                                    subTime[vertexLocation] = potentialTime;
+                                    subEnergy[vertexLocation] = evaluatedEnergy;
+                                }                          
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int targetCriticalLoc = 0; targetCriticalLoc < currentLocationCount; targetCriticalLoc++) {
+                if (locationList[targetCriticalLoc].isCriticalzone && subTime[targetCriticalLoc] != INT_MAX) {
+                    int combinedTotalTime = timeToStation + subTime[targetCriticalLoc];
+
+                    if( combinedTotalTime < globalBestTime) {
+                            globalBestTime = combinedTotalTime;
+                            optimalStationIndex = localStation;
+                            optimalTargetIndex = targetCriticalLoc;
+                            optimalEnergyPtI = energyToStation;
+                            optimalEnergyPtII = subEnergy[targetCriticalLoc];
+                    }
+                }        
+            }
+
+            delete[] subTime;
+            delete[] subEnergy;
+            delete[] subProcessed;
         }
+
+        if (optimalStationIndex != -1) {
+            os << "Optimal ath with recharge: \n";
+            os << "Chosen chargingstation: " << locationList[optimalStationIndex].locationName << "\n";
+            os << "Critical zone reached after recharge: " << locationList[optimalTargetIndex].locationName << "\n";
+            os << "Total travel time: " << globalBestTime << "\n";
+            os << "Energy consumed before recharge: " << optimalEnergyPtI << "\n";
+            os << "Energy consumed after recharge: " << optimalEnergyPtII << "\n";
+        }
+        else {
+            os << "No valid solution even with recharge. \n";
+        }
+
     }
+    delete[] minimumTimeCost;
+    delete[] energyDrainage;
+    delete[] pathPredecessor;
+    delete[] trackerVisitedLocations;
 }
-        
-
-
-
-
