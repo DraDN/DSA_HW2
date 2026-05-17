@@ -51,7 +51,7 @@ int main() {
 
       std::ostringstream out; rrm::Robot robot3("Base",10,5);
       smallCity.solvePathForRobot(robot3,out);
-      check(has(out.str(),"ChargingSt") && !has(out.str(),"No valid"), "recharge used when direct path costs too much energy"); }
+      check(has(out.str(),"ChargingSt") && has(out.str(),"Chosen chargingstation"), "recharge used when direct path costs too much energy"); }
  
     { rrm::CityGraph smallCity(10);
       smallCity.insertLocation("Base"); 
@@ -65,7 +65,7 @@ int main() {
 
       std::ostringstream out; rrm::Robot robot4("Base",9,5);
       smallCity.solvePathForRobot(robot4,out);
-      check(has(out.str(),"School") && !has(out.str(),"No valid"), "energy resets at station, each leg uses full autonomy budget"); }
+      check(has(out.str(),"School") && has(out.str(),"Chosen chargingstation"), "energy resets at station, each leg uses full autonomy budget"); }
  
     { rrm::CityGraph smallCity(10);
       smallCity.insertLocation("Base"); 
