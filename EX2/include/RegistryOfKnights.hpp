@@ -50,6 +50,8 @@ namespace RK {
             /// @param os the output stream to print to
             void tributeCollectionOrder(std::ostream& os) const;
 
+            void printFullTree(std::ostream& os) const;
+
 
             /// @brief Returns all knights of a specific house
             /// @param house the house to search for

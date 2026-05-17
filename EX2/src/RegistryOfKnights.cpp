@@ -39,6 +39,12 @@ void RK::RegistryOfKnights::tributeCollectionOrder(std::ostream &os) const {
     });
 }
 
+void RK::RegistryOfKnights::printFullTree(std::ostream &os) const {
+    registry.traverseInOrder([&](const Knight& k){
+        os << k.name << " | bravery: " << k.braveryScore << " | House " << k.house << " | " << k.battlesWon << " battles\n";
+    });
+}
+
 void RK::RegistryOfKnights::getKnightsOfHouse(const char *house, tools::Queue<Knight> &knights) const {
     registry.traverseInOrder([&](const Knight& k){
         if (strcmp(k.house, house) == 0) knights.enqueue(k);
