@@ -46,90 +46,61 @@ This exercise creates a program to manage a map of a city for emergency robots. 
 
 INPUT
 ```
-9 13 //Number fo areas , number of roads
-Base North East South West Hospital Depot School Center
-Route 1 of 13 (from to time risk energy): Base North 4 2 3
-Route 2 of 13 (from to time risk energy):  North East 3 1 2
-Route 3 of 13 (from to time risk energy): East Hospital 5 3 4
-Route 4 of 13 (from to time risk energy): Base South 6 2 5
-Route 5 of 13 (from to time risk energy): South West 2 1 2
-Route 6 of 13 (from to time risk energy): West Depot 4 2 3
-Route 7 of 13 (from to time risk energy): Depot Hospital 3 2 2
-Route 8 of 13 (from to time risk energy): North School 2 1 1
-Route 9 of 13 (from to time risk energy): School Depot 6 3 5
-Route 10 of 13 (from to time risk energy): Hospital Base 7 4 6
-Route 11 of 13 (from to time risk energy): East Center 2 2 2
-Route 12 of 13 (from to time risk energy): Center Hospital 2 1 1
-Route 13 of 13 (from to time risk energy): South Center 4 3 3
-3 //number of charging statons
-Hospital Depot School
-2 //number of critical zones
-Hospital Center
-Base //base point
-3 //number of robots
- Base 8 2 //data robot 1
- South 6 1 //data robot 2
- West 4 2 //data robot 3
+3 2                      // number of locations, number of routes
+Hospital School Depot    // all location names on ONE line separated by spaces
+Hospital School 10 2 5   // route 1: from  to  time  risk  energy
+School Depot 8 1 3       // route 2: from  to  time  risk  energy
+1                        // number of charging stations
+Hospital                 // charging station names on ONE line
+1                        // number of critical zones
+Depot                    // critical zone names on ONE line
+2                        // number of robots
+Hospital 20 3            // robot 1: start  autonomy  maxRisk
+School 15 2              // robot 2: start  autonomy  maxRisk
+Hospital                 // base location for unreachable areas check
 ```
 
 OUTPUT
 ```
-Location: Base
-  -> North (Time: 4 min, Risk: 2, Energy Drain: 3 units)
-  -> South (Time: 6 min, Risk: 2, Energy Drain: 5 units)
-Location: North
-  -> East (Time: 3 min, Risk: 1, Energy Drain: 2 units)
-  -> School (Time: 2 min, Risk: 1, Energy Drain: 1 units)
-Location: East
-  -> Hospital (Time: 5 min, Risk: 3, Energy Drain: 4 units)
-  -> Center (Time: 2 min, Risk: 2, Energy Drain: 2 units)
-Location: South
-  -> West (Time: 2 min, Risk: 1, Energy Drain: 2 units)
-  -> Center (Time: 4 min, Risk: 3, Energy Drain: 3 units)
-Location: West
-  -> Depot (Time: 4 min, Risk: 2, Energy Drain: 3 units)
-Location: Hospital (Charging Station) (Critical Zone)
-  -> Base (Time: 7 min, Risk: 4, Energy Drain: 6 units)
-Location: Depot (Charging Station)
-  -> Hospital (Time: 3 min, Risk: 2, Energy Drain: 2 units)
-Location: School (Charging Station)
-  -> Depot (Time: 6 min, Risk: 3, Energy Drain: 5 units)
-Location: Center (Critical Zone)
-  -> Hospital (Time: 2 min, Risk: 1, Energy Drain: 1 units)
+Location: Hospital (Charging Station)
+  -> School (Time: 10 min, Risk: 2, Energy Drain: 5 units)
+Location: School
+  -> Depot (Time: 8 min, Risk: 1, Energy Drain: 3 units)
+Location: Depot (Critical Zone)
+No outgoing roads.
 
 Most exposed area(s):
-Hospital with 3 incoming roads
+School with 1 incoming roads
+Depot with 1 incoming roads
 
 The network is valid when the road directions are ignored.
 
 Blocked area(s):
-No blocked areas found.
+Depot
 
 Robot 1:
-Initial position: Base
-Autonomy: 8
-Maximum accepted risk: 2
+Initial position: Hospital
+Autonomy: 20
+Maximum accepted risk: 3
 Optimal direct path to a critical zone: 
-Base -> North -> East -> Center
-Total travel time: 9
-Energy consumed 7
-Critical zone reached: Center
+Hospital -> School -> Depot
+Total travel time: 18
+Energy consumed 8
+Critical zone reached: Depot
 
 Robot 2:
-Initial position: South
-Autonomy: 6
-Maximum accepted risk: 1
-No valid direct path to a critical zone.
-No valid solution even with recharge. 
-
-Robot 3:
-Initial position: West
-Autonomy: 4
+Initial position: School
+Autonomy: 15
 Maximum accepted risk: 2
-No valid direct path to a critical zone.
-Optimal ath with recharge: 
-Chosen chargingstation: Depot
-Critical zone reached after recharge: Hospital
+Optimal direct path to a critical zone: 
+School -> Depot
+Total travel time: 8
+Energy consumed 3
+Critical zone reached: Depot
+
+Enter base location name: 
+From base Hospital, the following areas are unreachable: All areas are reachable from the base location.
+
 ```
 
 ## Exercise 2 - The Royal Chronicle of POLITEHNICA
