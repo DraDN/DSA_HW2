@@ -308,8 +308,10 @@ To make sure the project compiles and runs perfectly on any machine, follow thes
 
 To run the simulation:
 
-`.\src\city_simulation.exe`
+```
+.\src\city_simulation.exe
 
+```
 This will run the city map simulation. It automatically reads a list of locations, sets up charging points and danger zones, prints the full city infrastructure map, and calculates path routes for emergency robots.
 
 Or:
