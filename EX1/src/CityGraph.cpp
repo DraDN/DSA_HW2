@@ -1,5 +1,6 @@
 #include "CityGraph.hpp"
 #include <cstring>
+#include <climits>
 
 //A 
 void rrm::CityGraph::insertLocation(const char* locationName) {

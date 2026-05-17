@@ -273,19 +273,17 @@ Bedivere(80)
 
 ### Instructions
 
-To make sure the project compiles and runs perfectly on any machine, follow these steps inside your terminal while inside the main project folder:
+#### Exercise 1
 
-`cmake --build build`
+To compile and run the simulation, run the following command:
 
-To run the simulation:
+`cmake --build build --target run_ex1`
 
-```
-.\src\city_simulation.exe
-
-```
 This will run the city map simulation. It automatically reads a list of locations, sets up charging points and danger zones, prints the full city infrastructure map, and calculates path routes for emergency robots.
 
-Or:
+#### Exercise 2
+
+Run the command:
 
 `cmake --build build --target run_test_ex2`
 
